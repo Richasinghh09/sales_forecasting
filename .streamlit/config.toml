@@ -1,10 +1,11 @@
+[browser]
+gatherUsageStats = false
+
 [server]
-port = 8501
+port = 8080
 headless = true
 runOnSave = false
+enableXsrfProtection = false
 
 [logger]
-level = "info"
-
-[client]
-showErrorDetails = false
+level = "error"
