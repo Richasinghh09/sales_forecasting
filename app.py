@@ -3,21 +3,16 @@ import pandas as pd
 import joblib
 import os
 
+st.set_page_config(page_title="Rossmann Sales Forecasting", layout="centered")
+
 # Get the directory where this script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(script_dir, "rf_model_small.pkl")
 
-# Load Model with error handling
-try:
-    model = joblib.load(model_path)
-except FileNotFoundError:
-    st.error(f"❌ Model file not found at: {model_path}")
-    st.stop()
-except Exception as e:
-    st.error(f"❌ Error loading model: {str(e)}")
-    st.stop()
+@st.cache_resource(show_spinner=False)
+def load_model():
+    return joblib.load(model_path)
 
-st.set_page_config(page_title="Rossmann Sales Forecasting", layout="centered")
 st.title("🏪 Rossmann Sales Forecasting")
 st.markdown("---")
 
@@ -41,6 +36,13 @@ st.markdown("---")
 # Prediction Button
 if st.button("🎯 Predict Sales", use_container_width=True):
     try:
+        if not os.path.exists(model_path):
+            st.error(f"❌ Model file not found at: {model_path}")
+            st.stop()
+
+        with st.spinner("Loading forecasting model..."):
+            model = load_model()
+
         data = pd.DataFrame({
             "Store": [store],
             "DayOfWeek": [dayofweek],
